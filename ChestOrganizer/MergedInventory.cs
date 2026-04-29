@@ -282,8 +282,6 @@ public class MergedInventory : InventoryBase {
     private class IncludedInventory {
         private readonly MergedInventory parent;
         private readonly ICoreClientAPI api;
-        private readonly AssetLocation closeSound;
-        private readonly AssetLocation openSound;
         private readonly string title;
         private readonly int cols;
 
@@ -300,8 +298,6 @@ public class MergedInventory : InventoryBase {
             this.api = api;
             Entity = source;
             Inventory = source.Inventory;
-            closeSound = source.FindCloseSound();
-            openSound = source.FindOpenSound();
             Start = start;
             Count = Inventory.Count;
             title = source.GetDialogTitle();
@@ -317,7 +313,6 @@ public class MergedInventory : InventoryBase {
             this.api = api;
             Inventory = source.Inventory;
             Entity = api.World.BlockAccessor.GetBlockEntity(source.BlockEntityPosition);
-            closeSound = source.CloseSound;
             Start = start;
             Count = Inventory.Count;
             title = source.DialogTitle;
@@ -356,7 +351,6 @@ public class MergedInventory : InventoryBase {
                 player.InventoryManager.OpenInventory(Inventory);
                 SendPacket(api, Position, open: true);
             }
-            api.Gui.PlaySound(openSound, randomizePitch: true);
         }
 
         public void Close() {
@@ -364,7 +358,6 @@ public class MergedInventory : InventoryBase {
             // We need to do this again for lid to close... why??
             api.World.Player.InventoryManager.CloseInventory(Inventory);
             SendPacket(api, Position, open: false);
-            api.Gui.PlaySound(closeSound, randomizePitch: true);
         }
 
         public int UpdateCount(int start) {
@@ -377,7 +370,6 @@ public class MergedInventory : InventoryBase {
             Detach();
             var dialog = new GuiDialogBlockEntityInventory(title, Inventory, Position, cols, api);
             SetEntityDialog(Entity, dialog);
-            dialog.CloseSound = closeSound;
             dialog.TryOpen();
         }
 

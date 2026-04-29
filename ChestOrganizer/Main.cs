@@ -42,7 +42,7 @@ public class Main : ModSystem {
 
         float range = player.WorldData.PickingRange + 1;
         float rangesq = range * range;
-        var eyePos = player.Entity.Pos.XYZ.Add(player.Entity.LocalEyePos - 0.5f);
+        var eyePos = player.Entity.SidedPos.XYZ.Add(player.Entity.LocalEyePos - 0.5f);
         var accessor = api.World.BlockAccessor;
         List<BlockEntityGenericTypedContainer> chests = new();
 

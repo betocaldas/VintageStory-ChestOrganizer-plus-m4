@@ -23,7 +23,7 @@ public class GuiDialogMergedInventory : GuiDialogGeneric {
         var player = capi.World.Player;
         float range = player.WorldData.PickingRange + 1;
         float rangesq = range * range;
-        var eyePos = player.Entity.Pos.XYZ.Add(player.Entity.LocalEyePos - 0.5f);
+        var eyePos = player.Entity.SidedPos.XYZ.Add(player.Entity.LocalEyePos - 0.5f);
         var toRemove = inventory.ChestPositions
             .Where(p => p.DistanceSqTo(eyePos.X, eyePos.Y, eyePos.Z) > rangesq)
             .Select((p, i) => i)

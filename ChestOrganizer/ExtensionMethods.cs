@@ -6,16 +6,6 @@ using Vintagestory.GameContent;
 
 namespace ChestOrganizer;
 public static class ExtensionMethods {
-    public static AssetLocation FindOpenSound(this BlockEntityOpenableContainer self) {
-        Block block = self.Api.World.BlockAccessor.GetBlock(self.Pos);
-        return block.Attributes?["openSound"]?.AsAssetLocation(block.Code.Domain) ?? self.OpenSound;
-    }
-
-    public static AssetLocation FindCloseSound(this BlockEntityOpenableContainer self) {
-        Block block = self.Api.World.BlockAccessor.GetBlock(self.Pos);
-        return block.Attributes?["closeSound"]?.AsAssetLocation(block.Code.Domain) ?? self.CloseSound;
-    }
-
     public static string GetDialogTitle(this BlockEntityOpenableContainer self) {
         if (self is BlockEntityGenericContainer generic) {
             return Lang.Get(generic.dialogTitleLangCode);
