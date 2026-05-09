@@ -36,6 +36,7 @@ public class TitleBarAdditions {
             this.dialog = dialogInv;
             Activate(api, dialogInv.Inventory, dialog);
             icons.Insert(0, new(Icons.Merge, Merge, api, Lang.Get("chestorganizer:merge")));
+            icons.Insert(1, new(Icons.QuickStack, QuickStack, api, Lang.Get("chestorganizer:quickstack")));
         } else if (dialog is GuiDialogInventory) {
             var backpack = api.World.Player.InventoryManager.GetOwnInventory("backpack");
             if (backpack is not InventoryBase inventory) return;
@@ -45,6 +46,7 @@ public class TitleBarAdditions {
 
     public void Activate(ICoreClientAPI api, GuiDialogMergedInventory dialog) {
         Activate(api, dialog.Inventory, dialog);
+        icons.Add(new(Icons.QuickStack, QuickStack, api, Lang.Get("chestorganizer:quickstack")));
         icons.Add(new(Icons.Split, DetachAll, api, Lang.Get("chestorganizer:detachall")));
     }
 
@@ -81,6 +83,55 @@ public class TitleBarAdditions {
 
     private void Find() 
         => search.Toggle();
+
+    private void QuickStack() {
+        var player = api.World.Player;
+        var manager = player.InventoryManager;
+        if (manager.GetOwnInventory("backpack") is not InventoryBase backpack) return;
+
+        var existing = CollectExistingItemCodes(inventory);
+        if (existing.Count == 0) return;
+
+        foreach (var src in backpack) {
+            if (src?.Itemstack == null) continue;
+            if (!existing.Contains(src.Itemstack.Collectible.Code)) continue;
+            DepositSlotIntoInventory(src, player, manager);
+        }
+    }
+
+    private static HashSet<AssetLocation> CollectExistingItemCodes(InventoryBase inv) {
+        var codes = new HashSet<AssetLocation>();
+        foreach (var slot in inv) {
+            if (slot?.Itemstack != null) {
+                codes.Add(slot.Itemstack.Collectible.Code);
+            }
+        }
+        return codes;
+    }
+
+    private void DepositSlotIntoInventory(ItemSlot src, IPlayer player, IPlayerInventoryManager manager) {
+        foreach (var dst in inventory) {
+            if (src.Empty) return;
+            if (dst == null || dst.Empty) continue;
+            if (!dst.CanTakeFrom(src)) continue;
+            TransferStack(src, dst, player, manager);
+        }
+        foreach (var dst in inventory) {
+            if (src.Empty) return;
+            if (dst != null && dst.Empty) {
+                TransferStack(src, dst, player, manager);
+            }
+        }
+    }
+
+    private void TransferStack(ItemSlot src, ItemSlot dst, IPlayer player, IPlayerInventoryManager manager) {
+        var op = new ItemStackMoveOperation(api.World, EnumMouseButton.Left, 0, EnumMergePriority.AutoMerge, src.StackSize) {
+            ActingPlayer = player,
+        };
+        if (manager.TryTransferTo(src, dst, ref op) is Packet_Client packet) {
+            api.Network.SendPacketClient(packet);
+        }
+    }
 
     private void MoveToMerged(GuiDialogBlockEntityInventory dialog) {
         if (Patch_ChestDialog.BlockCloseInventory(dialog.TryClose)) {

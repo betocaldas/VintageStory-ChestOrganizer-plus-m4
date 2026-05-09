@@ -1,10 +1,11 @@
 {
-  "title"     : "Merged",
-  "close"     : "Close",
-  "detach"    : "Detach",
-  "sort"      : "Sort\n<i>Hold shift to sort by name.</i>",
-  "find"      : "Find",
-  "merge"     : "Merge\n<i>Hold shift to merge all open containers.</i>",
-  "detachall" : "Detach all",
-  "openall"   : "Open all containers in range"
+  "title"      : "Merged",
+  "close"      : "Close",
+  "detach"     : "Detach",
+  "sort"       : "Sort\n<i>Hold shift to sort by name.</i>",
+  "find"       : "Find",
+  "merge"      : "Merge\n<i>Hold shift to merge all open containers.</i>",
+  "quickstack" : "Quick stack\n<i>Deposits matching items from your backpack into this container.</i>",
+  "detachall"  : "Detach all",
+  "openall"    : "Open all containers in range"
 }

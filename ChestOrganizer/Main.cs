@@ -4,6 +4,7 @@ using System.Linq;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
 using Vintagestory.API.Config;
+using Vintagestory.API.MathTools;
 using Vintagestory.API.Util;
 using Vintagestory.GameContent;
 
@@ -38,6 +39,13 @@ public class Main : ModSystem {
     public bool OpenAll(KeyCombination _) {
         var player = api.World.Player;
         if (player.WorldData.CurrentGameMode == EnumGameMode.Creative) return false;
+
+        var openMerged = api.OpenedGuis.OfType<GuiDialogMergedInventory>().FirstOrDefault();
+        if (openMerged != null) {
+            openMerged.TryClose();
+            return true;
+        }
+
         var reinforcement = api.ModLoader.GetModSystem<ModSystemBlockReinforcement>();
 
         float range = player.WorldData.PickingRange + 1;
@@ -47,6 +55,7 @@ public class Main : ModSystem {
         List<BlockEntityGenericTypedContainer> chests = new();
 
         accessor.WalkBlocks((eyePos - range).AsBlockPos, (eyePos + (range + 1.0f)).AsBlockPos, Step);
+
         MergedInventory.MergeRange(chests, api);
 
         return true;
@@ -54,11 +63,27 @@ public class Main : ModSystem {
 
         void Step(Block b, int x, int y, int z) {
             if (eyePos.SquareDistanceTo(x, y, z) > rangesq) return;
-            var entity = accessor.GetBlockEntity<BlockEntityGenericTypedContainer>(new(x, y, z));
-            bool locked = reinforcement.IsLockedForInteract(new(x, y, z), player);
-            if (!locked && (!entity?.Inventory.HasOpened(player) ?? false)) {
-                chests.Add(entity);
-            }
+            var pos = new BlockPos(x, y, z);
+            var entity = accessor.GetBlockEntity<BlockEntityGenericTypedContainer>(pos);
+            if (entity == null) return;
+
+            if (reinforcement.IsLockedForInteract(pos, player)) return;
+            if (IsClaimRestricted(pos, player)) return;
+            if (entity.Inventory.HasOpened(player)) return;
+
+            chests.Add(entity);
+        }
+    }
+
+    private bool IsClaimRestricted(BlockPos pos, IPlayer player) {
+        try {
+            var claims = api.World.Claims;
+            if (claims == null) return false;
+            var atPos = claims.Get(pos);
+            if (atPos == null || atPos.Length == 0) return false;
+            return claims.TestAccess(player, pos, EnumBlockAccessFlags.Use) != EnumWorldAccessResponse.Granted;
+        } catch {
+            return false;
         }
     }
 }

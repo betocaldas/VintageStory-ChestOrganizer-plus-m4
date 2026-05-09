@@ -181,6 +181,28 @@ public static class Icons {
         context.Restore();
     }
 
+    public static void QuickStack(Context context, double x, double y, double width, double height, double[] color) {
+        context.Save();
+        Pattern pattern = SetupContext(context, x, y, width, height, color, 158, 158);
+
+        context.NewPath();
+        context.MoveTo( 79,   0);
+        context.LineTo( 79,  55);
+        context.MoveTo( 15,  98);
+        context.LineTo( 15, 158);
+        context.LineTo(143, 158);
+        context.LineTo(143,  98);
+        context.Stroke();
+
+        context.MoveTo( 35,  50);
+        context.LineTo(123,  50);
+        context.LineTo( 79,  95);
+        context.Fill();
+
+        pattern.Dispose();
+        context.Restore();
+    }
+
     public static void Divider(Context context, double x, double y, double width, double height, double[] color) {
         context.Save();
         Pattern pattern = SetupContext(context, x, y, width, height, color, 1000, 100);

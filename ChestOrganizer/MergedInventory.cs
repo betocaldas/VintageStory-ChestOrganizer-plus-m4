@@ -26,6 +26,7 @@ public class MergedInventory : InventoryBase {
         current.AddFromDialog(source);
     }
 
+
     public static void MergeRange(IEnumerable<BlockEntityOpenableContainer> containers, ICoreClientAPI api) {
         current ??= new(api);
         current.AddRange(containers);

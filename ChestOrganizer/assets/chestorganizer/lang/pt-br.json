@@ -1,0 +1,11 @@
+{
+  "title"      : "Mesclados",
+  "close"      : "Fechar",
+  "detach"     : "Desanexar",
+  "sort"       : "Ordenar\n<i>Segure shift para ordenar por nome.</i>",
+  "find"       : "Buscar",
+  "merge"      : "Mesclar\n<i>Segure shift para mesclar todos os contêineres abertos.</i>",
+  "quickstack" : "Empilhar rápido\n<i>Deposita itens da mochila que já existem neste contêiner.</i>",
+  "detachall"  : "Desanexar todos",
+  "openall"    : "Abrir todos os contêineres no alcance"
+}
