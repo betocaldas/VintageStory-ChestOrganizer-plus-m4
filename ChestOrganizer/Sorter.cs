@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
@@ -69,8 +70,20 @@ public static class Sorter {
         }
 
         void Flip(ItemSlot a, ItemSlot b) {
-            if (a.TryFlipWith(b)) {
-                SendPacket(a.Inventory.InvNetworkUtil.GetFlipSlotsPacket(b.Inventory, SlotId(b), SlotId(a)));
+            // Some composite inventories (e.g. InventoryPlayerBackPack in VS 1.22+) have
+            // virtual/wrapper slots whose DidModifyItemSlot validation fails across
+            // sub-inventories. Catch the resulting ArgumentException to avoid crashing.
+            try {
+                if (a.TryFlipWith(b)) {
+                    SendPacket(a.Inventory.InvNetworkUtil.GetFlipSlotsPacket(b.Inventory, SlotId(b), SlotId(a)));
+                }
+            } catch (ArgumentException) {
+                // Swap failed: fall back to a two-move approach via Move to preserve
+                // as much ordering as possible.
+                if (!a.Empty && !b.Empty) {
+                    // If Move partially moves (e.g. stackable), accept it; otherwise skip.
+                    Move(a, b);
+                }
             }
         }
 
